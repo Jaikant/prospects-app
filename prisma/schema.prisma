@@ -1,0 +1,92 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// electron generator
+//generator client {
+//  provider = "prisma-client-js"
+//  binaryTargets = ["native", "windows"]
+//  output   = "../src/main/generated/client"
+//}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // directUrl = env("DIRECT_URL")
+}
+
+
+model Person {
+  id             Int            @id @default(autoincrement())
+  name           String
+  email          String         @unique
+  mobile         String?
+  dob            DateTime?
+  country        String?
+  state          String?
+  city           String?
+  prospectEntries ProspectEntry[]
+  enrollments    Enrollment[]
+}
+
+model Program {
+  id                    Int                 @id @default(autoincrement())
+  programId             String @unique
+  title                 String
+  startDate             DateTime
+  programUrl            String?
+  vvmvpProspectCount    Int?
+  vvmvpEnrollmentCount  Int?
+  prospectEntries       ProspectEntry[]
+  enrollments           Enrollment[]
+  programAccommodations ProgramAccommodation[]
+}
+
+model ProspectEntry {
+  id              Int        @id @default(autoincrement())
+  createdAt       DateTime
+  numberOfVisits  Int?
+  personId        Int
+  programGeneratedId       Int
+  person          Person     @relation(fields: [personId], references: [id])
+  program         Program    @relation(fields: [programGeneratedId], references: [id])
+  registered      Boolean    @default(false)
+  callRecords     CallRecord[]
+  @@unique([personId, programGeneratedId, createdAt],  name: "person_program_time_unique")
+}
+
+model Enrollment {
+  id              Int        @id @default(autoincrement())
+  createdAt       DateTime
+  sharingType     String
+  personId        Int
+  programGeneratedId       Int
+  person          Person     @relation(fields: [personId], references: [id])
+  program         Program    @relation(fields: [programGeneratedId], references: [id])
+  @@unique([personId, programGeneratedId],  name: "person_program_unique")
+}
+
+model AccommodationType {
+  id                    Int                   @id @default(autoincrement())
+  type                  String
+  programAccommodations ProgramAccommodation[]
+}
+
+model ProgramAccommodation {
+  id                    Int                 @id @default(autoincrement())
+  programId             Int
+  accommodationTypeId   Int
+  seatsTaken            Int
+  seatsReserved         Int
+  program               Program             @relation(fields: [programId], references: [id])
+  accommodationType     AccommodationType  @relation(fields: [accommodationTypeId], references: [id])
+}
+
+model CallRecord {
+  id              Int           @id @default(autoincrement())
+  calledAt        DateTime      @default(now())
+  calledBy        String
+  prospectEntryId Int
+  prospectEntry   ProspectEntry @relation(fields: [prospectEntryId], references: [id])
+}
