@@ -103,9 +103,9 @@ const ProspectEnrollmentTimeline = ({ data }) => {
     if (dayCount <= 60) {
       tickInterval = timeDay.every(1);  // Daily ticks
     } else if (dayCount <= 180) {
-      tickInterval = timeDay.every(3);  // Every 3 days
+      tickInterval = timeWeek.every(1);  // Every 3 days
     } else if (dayCount <= 365) {
-      tickInterval = timeWeek.every(1);  // Weekly ticks
+      tickInterval = timeWeek.every(2);  // Weekly ticks
     } else if (dayCount <= 365 * 2) {
       tickInterval = timeMonth.every(1);  // Monthly ticks
     } else {
